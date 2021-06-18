@@ -96,5 +96,5 @@ enum AudioEncoder {
   OPUS,
 
   ///通用格式，解决iOS无法播放Android录音问题
-  ACC_ADTS,
+  AAC_ADTS,
 }
