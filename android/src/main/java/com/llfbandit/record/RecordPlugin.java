@@ -12,71 +12,71 @@ import io.flutter.plugin.common.MethodChannel;
  * RecordPlugin
  */
 public class RecordPlugin implements FlutterPlugin, ActivityAware {
-  /// The MethodChannel that will the communication between Flutter and native Android
-  private MethodChannel channel;
-  /// Our call handler
-  private MethodCallHandlerImpl handler;
-  private FlutterPluginBinding pluginBinding;
-  private ActivityPluginBinding activityBinding;
+    /// The MethodChannel that will the communication between Flutter and native Android
+    private MethodChannel channel;
+    /// Our call handler
+    private MethodCallHandlerImpl handler;
+    private FlutterPluginBinding pluginBinding;
+    private ActivityPluginBinding activityBinding;
 
-  /////////////////////////////////////////////////////////////////////////////
-  /// FlutterPlugin
-  /////////////////////////////////////////////////////////////////////////////
-  @Override
-  public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
-    pluginBinding = binding;
-  }
+    /////////////////////////////////////////////////////////////////////////////
+    /// FlutterPlugin
+    /////////////////////////////////////////////////////////////////////////////
+    @Override
+    public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
+        pluginBinding = binding;
+    }
 
-  @Override
-  public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-    pluginBinding = null;
-  }
-  /// END FlutterPlugin
-  /////////////////////////////////////////////////////////////////////////////
+    @Override
+    public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+        pluginBinding = null;
+    }
+    /// END FlutterPlugin
+    /////////////////////////////////////////////////////////////////////////////
 
 
-  /////////////////////////////////////////////////////////////////////////////
-  /// ActivityAware
-  /////////////////////////////////////////////////////////////////////////////
-  @Override
-  public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
-    activityBinding = binding;
+    /////////////////////////////////////////////////////////////////////////////
+    /// ActivityAware
+    /////////////////////////////////////////////////////////////////////////////
+    @Override
+    public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
+        activityBinding = binding;
 
-    startPlugin(pluginBinding.getBinaryMessenger(), binding);
-  }
+        startPlugin(pluginBinding.getBinaryMessenger(), binding);
+    }
 
-  @Override
-  public void onDetachedFromActivityForConfigChanges() {
-    onDetachedFromActivity();
-  }
+    @Override
+    public void onDetachedFromActivityForConfigChanges() {
+        onDetachedFromActivity();
+    }
 
-  @Override
-  public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
-    onAttachedToActivity(binding);
-  }
+    @Override
+    public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
+        onAttachedToActivity(binding);
+    }
 
-  @Override
-  public void onDetachedFromActivity() {
-    stopPlugin();
-  }
+    @Override
+    public void onDetachedFromActivity() {
+        stopPlugin();
+    }
 
-  private void startPlugin(BinaryMessenger messenger, ActivityPluginBinding binding) {
+    private void startPlugin(BinaryMessenger messenger, ActivityPluginBinding binding) {
 
-    handler = new MethodCallHandlerImpl(binding.getActivity());
-    channel = new MethodChannel(messenger, "com.llfbandit.record");
-    channel.setMethodCallHandler(handler);
+        channel = new MethodChannel(messenger, "com.llfbandit.record");
+        handler = new MethodCallHandlerImpl(binding.getActivity(), channel);
+        channel.setMethodCallHandler(handler);
 
-    binding.addRequestPermissionsResultListener(handler);
-  }
+        binding.addRequestPermissionsResultListener(handler);
+    }
 
-  private void stopPlugin() {
-    activityBinding.removeRequestPermissionsResultListener(handler);
-    activityBinding = null;
-    channel.setMethodCallHandler(null);
-    handler.close();
-    handler = null;
-    channel = null;
-  }
-  /// END ActivityAware
-  /////////////////////////////////////////////////////////////////////////////
+    private void stopPlugin() {
+        activityBinding.removeRequestPermissionsResultListener(handler);
+        activityBinding = null;
+        channel.setMethodCallHandler(null);
+        handler.close();
+        handler = null;
+        channel = null;
+    }
+    /// END ActivityAware
+    /////////////////////////////////////////////////////////////////////////////
 }

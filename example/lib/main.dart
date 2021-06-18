@@ -21,6 +21,9 @@ class _AudioRecorderState extends State<AudioRecorder> {
   int _recordDuration = 0;
   Timer? _timer;
 
+  ///声音分贝
+  ValueNotifier<double> _volumedB = ValueNotifier<double>(0);
+
   @override
   void initState() {
     _isRecording = false;
@@ -30,6 +33,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
   @override
   void dispose() {
     _timer?.cancel();
+    _volumedB.dispose();
     super.dispose();
   }
 
@@ -41,6 +45,8 @@ class _AudioRecorderState extends State<AudioRecorder> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              _buildDbListener(),
+              const SizedBox(width: 20),
               _buildRecordStopControl(),
               const SizedBox(width: 20),
               _buildPauseResumeControl(),
@@ -50,6 +56,21 @@ class _AudioRecorderState extends State<AudioRecorder> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildDbListener() {
+    return ValueListenableBuilder<double>(
+      valueListenable: _volumedB,
+      builder: (_, double volume, __) {
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 100),
+          curve: Curves.ease,
+          width: 5,
+          height: volume,
+          color: Colors.blue,
+        );
+      },
     );
   }
 
@@ -139,7 +160,12 @@ class _AudioRecorderState extends State<AudioRecorder> {
   Future<void> _start() async {
     try {
       if (await Record.hasPermission()) {
-        await Record.start(path: widget.path,encoder: AudioEncoder.ACC_ADTS);
+        await Record.start(
+            path: widget.path,
+            encoder: AudioEncoder.AAC_ADTS,
+            onVolumeChange: (double volume) {
+              _volumedB.value = volume;
+            });
 
         bool isRecording = await Record.isRecording();
         setState(() {

@@ -23,7 +23,18 @@ class Record {
     AudioEncoder encoder = AudioEncoder.AAC,
     int bitRate = 128000,
     double samplingRate = 44100.0,
+    Function(double)? onVolumeChange,
   }) {
+    _channel.setMethodCallHandler((call) async {
+      if (call.method == 'onVolumeChange') {
+        print('参数:${call.arguments}');
+
+        if ((call.arguments is double) && onVolumeChange != null) {
+          onVolumeChange(call.arguments ?? 0);
+        }
+      }
+    });
+
     return _channel.invokeMethod('start', {
       "path": path,
       "encoder": encoder.index,
@@ -34,6 +45,8 @@ class Record {
 
   /// Stops recording session and release internal recorder resource.
   static Future<void> stop() {
+    _channel.setMethodCallHandler(null);
+
     return _channel.invokeMethod('stop');
   }
 
