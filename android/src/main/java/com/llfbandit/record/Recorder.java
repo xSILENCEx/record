@@ -133,6 +133,8 @@ class Recorder {
   private int getOutputFormat(int encoder) {
     if (encoder == 3 || encoder == 4) {
       return MediaRecorder.OutputFormat.THREE_GPP;
+    }else if(encoder==6){
+      return MediaRecorder.OutputFormat.AAC_ADTS;
     }
 
     return MediaRecorder.OutputFormat.MPEG_4;
