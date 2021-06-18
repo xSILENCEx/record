@@ -139,7 +139,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
   Future<void> _start() async {
     try {
       if (await Record.hasPermission()) {
-        await Record.start(path: widget.path);
+        await Record.start(path: widget.path,encoder: AudioEncoder.ACC_ADTS);
 
         bool isRecording = await Record.isRecording();
         setState(() {
