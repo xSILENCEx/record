@@ -33,6 +33,7 @@ class Recorder {
     recorder.setAudioEncodingBitRate(bitRate);
     recorder.setAudioSamplingRate((int) samplingRate);
     recorder.setOutputFormat(getOutputFormat(encoder));
+    recorder.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS);
     // must be set after output format
     recorder.setAudioEncoder(getEncoder(encoder));
     recorder.setOutputFile(path);
