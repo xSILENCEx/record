@@ -8,9 +8,7 @@ import 'package:flutter/services.dart';
 /// So exiting, your app or activity will stop the recording (but won't delete the
 /// output file).
 class Record {
-  static const MethodChannel _channel = const MethodChannel(
-    'com.llfbandit.record',
-  );
+  static const MethodChannel _channel = MethodChannel('com.llfbandit.record');
 
   /// Starts new recording session.
   ///
@@ -25,21 +23,23 @@ class Record {
     double samplingRate = 44100.0,
     Function(double)? onVolumeChange,
   }) {
-    _channel.setMethodCallHandler((call) async {
+    _channel.setMethodCallHandler((MethodCall call) async {
       if (call.method == 'onVolumeChange') {
         print('参数:${call.arguments}');
 
-        if ((call.arguments is double) && onVolumeChange != null) {
-          onVolumeChange(call.arguments ?? 0);
+        final double db = call.arguments as double? ?? 0.0;
+
+        if (db >= 0 && onVolumeChange != null) {
+          onVolumeChange(db);
         }
       }
     });
 
-    return _channel.invokeMethod('start', {
-      "path": path,
-      "encoder": encoder.index,
-      "bitRate": bitRate,
-      "samplingRate": samplingRate,
+    return _channel.invokeMethod('start', <String, dynamic>{
+      'path': path,
+      'encoder': encoder.index,
+      'bitRate': bitRate,
+      'samplingRate': samplingRate,
     });
   }
 
@@ -67,19 +67,19 @@ class Record {
   /// Checks if there's valid recording session.
   /// So if session is paused, this method will still return [true].
   static Future<bool> isRecording() async {
-    final result = await _channel.invokeMethod<bool>('isRecording');
+    final bool? result = await _channel.invokeMethod<bool>('isRecording');
     return result ?? false;
   }
 
   /// Checks if recording session is paused.
   static Future<bool> isPaused() async {
-    final result = await _channel.invokeMethod<bool>('isPaused');
+    final bool? result = await _channel.invokeMethod<bool>('isPaused');
     return result ?? false;
   }
 
   /// Checks and requests for audio record permission.
   static Future<bool> hasPermission() async {
-    final result = await _channel.invokeMethod<bool>('hasPermission');
+    final bool? result = await _channel.invokeMethod<bool>('hasPermission');
     return result ?? false;
   }
 }

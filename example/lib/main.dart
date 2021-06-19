@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -6,10 +7,9 @@ import 'package:record/record.dart';
 import 'package:record_example/audio_player.dart';
 
 class AudioRecorder extends StatefulWidget {
+  const AudioRecorder({required this.path, required this.onStop});
   final String path;
   final VoidCallback onStop;
-
-  const AudioRecorder({required this.path, required this.onStop});
 
   @override
   _AudioRecorderState createState() => _AudioRecorderState();
@@ -22,7 +22,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
   Timer? _timer;
 
   ///声音分贝
-  ValueNotifier<double> _volumedB = ValueNotifier<double>(0);
+  final ValueNotifier<double> _volumedB = ValueNotifier<double>(0);
 
   @override
   void initState() {
@@ -79,10 +79,10 @@ class _AudioRecorderState extends State<AudioRecorder> {
     late Color color;
 
     if (_isRecording || _isPaused) {
-      icon = Icon(Icons.stop, color: Colors.red, size: 30);
+      icon = const Icon(Icons.stop, color: Colors.red, size: 30);
       color = Colors.red.withOpacity(0.1);
     } else {
-      final theme = Theme.of(context);
+      final ThemeData theme = Theme.of(context);
       icon = Icon(Icons.mic, color: theme.primaryColor, size: 30);
       color = theme.primaryColor.withOpacity(0.1);
     }
@@ -109,11 +109,11 @@ class _AudioRecorderState extends State<AudioRecorder> {
     late Color color;
 
     if (!_isPaused) {
-      icon = Icon(Icons.pause, color: Colors.red, size: 30);
+      icon = const Icon(Icons.pause, color: Colors.red, size: 30);
       color = Colors.red.withOpacity(0.1);
     } else {
-      final theme = Theme.of(context);
-      icon = Icon(Icons.play_arrow, color: Colors.red, size: 30);
+      final ThemeData theme = Theme.of(context);
+      icon = const Icon(Icons.play_arrow, color: Colors.red, size: 30);
       color = theme.primaryColor.withOpacity(0.1);
     }
 
@@ -135,7 +135,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
       return _buildTimer();
     }
 
-    return Text("Waiting to record");
+    return const Text('Waiting to record');
   }
 
   Widget _buildTimer() {
@@ -144,7 +144,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
 
     return Text(
       '$minutes : $seconds',
-      style: TextStyle(color: Colors.red),
+      style: const TextStyle(color: Colors.red),
     );
   }
 
@@ -167,7 +167,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
               _volumedB.value = volume;
             });
 
-        bool isRecording = await Record.isRecording();
+        final bool isRecording = await Record.isRecording();
         setState(() {
           _isRecording = isRecording;
           _recordDuration = 0;
@@ -204,7 +204,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
   }
 
   void _startTimer() {
-    const tick = const Duration(seconds: 1);
+    const Duration tick = Duration(seconds: 1);
 
     _timer?.cancel();
 
@@ -240,11 +240,11 @@ class _MyAppState extends State<MyApp> {
         body: Center(
           child: FutureBuilder<String>(
             future: getPath(),
-            builder: (context, snapshot) {
+            builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
               if (snapshot.hasData) {
                 if (showPlayer) {
                   return Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 25),
+                    padding: const EdgeInsets.symmetric(horizontal: 25),
                     child: AudioPlayer(
                       path: snapshot.data!,
                       onDelete: () {
@@ -261,7 +261,7 @@ class _MyAppState extends State<MyApp> {
                   );
                 }
               } else {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               }
             },
           ),
@@ -272,11 +272,8 @@ class _MyAppState extends State<MyApp> {
 
   Future<String> getPath() async {
     if (path == null) {
-      final dir = await getApplicationDocumentsDirectory();
-      path = dir.path +
-          '/' +
-          DateTime.now().millisecondsSinceEpoch.toString() +
-          '.m4a';
+      final Directory dir = await getApplicationDocumentsDirectory();
+      path = dir.path + '/' + DateTime.now().millisecondsSinceEpoch.toString() + '.m4a';
     }
     return path!;
   }
