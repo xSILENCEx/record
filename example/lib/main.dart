@@ -162,8 +162,8 @@ class _AudioRecorderState extends State<AudioRecorder> {
       if (await Record.hasPermission()) {
         await Record.start(
             path: widget.path,
-            encoder: AudioEncoder.AAC_ADTS,
-            onVolumeChange: (double volume) {
+            onDecibelChange: (double volume) {
+              print('db:$volume');
               _volumedB.value = volume;
             });
 

@@ -24,7 +24,7 @@ class VolumeChange implements Callable {
 
     public void call(double volume) {
         if (channel != null)
-            channel.invokeMethod("onVolumeChange", volume);
+            channel.invokeMethod("onDecibelChange", volume);
     }
 }
 

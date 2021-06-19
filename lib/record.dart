@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/services.dart';
 
@@ -18,26 +19,27 @@ class Record {
   /// [samplingRate]: The sampling rate for audio in samples per second.
   static Future<void> start({
     required String path,
-    AudioEncoder encoder = AudioEncoder.AAC,
+    AudioEncoder? encoder,
     int bitRate = 128000,
     double samplingRate = 44100.0,
-    Function(double)? onVolumeChange,
+    Function(double)? onDecibelChange,
   }) {
     _channel.setMethodCallHandler((MethodCall call) async {
-      if (call.method == 'onVolumeChange') {
-        print('参数:${call.arguments}');
-
-        final double db = call.arguments as double? ?? 0.0;
-
-        if (db >= 0 && onVolumeChange != null) {
-          onVolumeChange(db);
+      try {
+        if (call.method == 'onDecibelChange') {
+          final double db = call.arguments as double? ?? 0.0;
+          if (db >= 0 && onDecibelChange != null) {
+            onDecibelChange(db);
+          }
         }
+      } catch (e) {
+        print('分贝值监听出错:$e');
       }
     });
 
     return _channel.invokeMethod('start', <String, dynamic>{
       'path': path,
-      'encoder': encoder.index,
+      'encoder': (encoder ?? (Platform.isIOS ? AudioEncoder.AAC : AudioEncoder.AAC_ADTS)).index,
       'bitRate': bitRate,
       'samplingRate': samplingRate,
     });
