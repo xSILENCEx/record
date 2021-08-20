@@ -48,6 +48,9 @@ enum AudioEncoder {
   /// /!\ SDK 29 on Android /!\
   /// /!\ SDK 11 on iOs /!\
   OPUS,
+
+  ///通用格式，解决iOS无法播放Android录音问题
+  AAC_ADTS,
 }
 ```
 

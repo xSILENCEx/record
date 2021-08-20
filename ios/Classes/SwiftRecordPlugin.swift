@@ -21,9 +21,10 @@ public class SwiftRecordPlugin: NSObject, FlutterPlugin, AVAudioRecorderDelegate
     
     //音量分贝监听
     @objc func volumeListener(){
+        if(audioRecorder == nil) {return}
         audioRecorder!.updateMeters() // 刷新音量数据
         var power:Float = audioRecorder!.averagePower(forChannel: 0) //获取音量的平均值
-        if(power>0.0) {return}
+        if(power > 0.0) {return}
         power = power + 60;
         let dB:Float = power*2;
         channel.invokeMethod("onDecibelChange", arguments: dB)
