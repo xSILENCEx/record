@@ -58,12 +58,12 @@ public class SwiftRecordPlugin: NSObject, FlutterPlugin, AVAudioRecorderDelegate
             startTimer()
             break
         case "stop":
-            stop(result)
             stopTimer()
+            stop(result)
             break
         case "pause":
-            pause(result)
             stopTimer()
+            pause(result)
             break
         case "resume":
             resume(result)
